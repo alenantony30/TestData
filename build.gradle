@@ -41,6 +41,10 @@ dependencies {
 	implementation group: 'com.github.javafaker', name: 'javafaker', version: '1.0.2'
 	implementation 'com.github.javafaker:javafaker:1.0.2' // Replace with the latest version
 	
+	// https://mvnrepository.com/artifact/com.github.mifmif/generex
+	implementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
+	
+	
 	
 	
 }

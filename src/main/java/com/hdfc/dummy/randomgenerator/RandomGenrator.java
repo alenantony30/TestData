@@ -32,7 +32,7 @@ public class RandomGenrator {
 		this.revGeoCodeService = revGeoCodeService;
 	}
 
-	public static int noOfRecords = 5000;
+	public static int noOfRecords = 10;
 
 	public static FileOutputStream fileOut;
 
@@ -44,7 +44,7 @@ public class RandomGenrator {
 
 		try {
 
-			File excelFile = new File("C:\\Users\\ALENS\\OneDrive\\Desktop\\Fields.xlsx"); // Replace with your Excel
+			File excelFile = new File("InputFields.xlsx"); // Replace with your Excel
 																							// file path
 			FileInputStream fis = new FileInputStream(excelFile);
 
@@ -63,18 +63,25 @@ public class RandomGenrator {
 				Cell fieldCell = row.getCell(0);
 				Cell classCell = row.getCell(1);
 				Cell limitCell = row.getCell(2);
+				Cell minCell = row.getCell(3);
+				Cell maxCell = row.getCell(4);
+				Cell expCell = row.getCell(5);
 
 				if (fieldCell != null && classCell != null) {
 					String fieldName = fieldCell.getStringCellValue();
 					String className = classCell.getStringCellValue();
 
-					if (limitCell != null) {
+					if (limitCell != null && minCell != null && maxCell != null && expCell != null) {
 
 						Integer limit = (int) limitCell.getNumericCellValue();
-						generateFields(className, fieldName, limit);
+						Integer min = (int) minCell.getNumericCellValue();
+						Integer max = (int) maxCell.getNumericCellValue();
+						String exp = expCell.getStringCellValue();
+
+						generateFields(className, fieldName, limit, min, max, exp);
 					} else {
 
-						generateFields(className, fieldName, 0);
+						generateFields(className, fieldName, 0, 0, 0, null);
 					}
 				}
 
@@ -91,11 +98,26 @@ public class RandomGenrator {
 
 	///////////////////////////////////////////////////////////////////////////////////
 
-	private void generateFields(String className, String fieldName, int limit) {
+	private void generateFields(String className, String fieldName, int limit, int min, int max, String exp) {
 
 		System.out.println(fieldName + " " + className);
 
 		switch (className) {
+
+		case "RegexGenerator":
+
+			ArrayList<String> regexArrayList = new ArrayList<>();
+			for (int i = 0; i < noOfRecords; i++) {
+				regexArrayList.add(RegexGenerator.generator(exp,min,max,limit));
+			}
+			System.out.println(regexArrayList.toString());
+			System.out.println();
+
+			String[] regexArray = new String[regexArrayList.size()];
+			regexArray = regexArrayList.toArray(regexArray);
+			writeFieldsToExcel(regexArray, fieldName);
+
+			break;
 
 		case "AadharNumberGenerartor":
 			Set<String> generatedAadharNumbers = new HashSet<>();
@@ -785,25 +807,17 @@ public class RandomGenrator {
 				formattedAddressArray[i] = revGeoCode.getFormattedAddress();
 
 				responseString[i] = "{\\\"responseCode\\\":200,\\\"version\\\":\\\"2023.06\\\",\\\"results\\\":[{\\\"houseNumber\\\":\\\""
-						+ houseNumberArray[i]
-						+ "\\\",\\\"houseName\\\":\\\"" + houseNameArray[i] 
-						+ "\\\",\\\"poi\\\":\\\""+ poiArray[i]
-						+ "\\\",\\\"poi_dist\\\":\\\"" + poiDistArray[i]
-						+ "\\\",\\\"street\\\":\\\"" + streetArray[i]
-						+ "\\\",\\\"street_dist\\\":\\\"" + streetDistArray[i]
-				        + "\\\",\\\"subSubLocality\\\":\\\""+ subSubLocalityArray[i]
-				        + "\\\",\\\"subLocality\\\":\\\"" + subLocalityArray[i]
-				        + "\\\",\\\"locality\\\":\\\"" + localityArray[i] 
-				        + "\\\",\\\"village\\\":\\\"" + villageArray[i] 
-				        + "\\\",\\\"district\\\":\\\""+ districtArray[i]
-                        + "\\\",\\\"subDistrict\\\":\\\"" + subDistrictArray[i] 
-                        + "\\\",\\\"city\\\":\\\""+ cityArray2[i] 
-                        + "\\\",\\\"state\\\":\\\"" + stateArray2[i] 
-                        + "\\\",\\\"pincode\\\":\\\"" + pincodeArray[i]
-						+ "\\\",\\\"lat\\\":\\\"" + latArray[i] 
-						+ "\\\",\\\"lng\\\":\\\"" + lngArray[i] 
-						+ "\\\",\\\"area\\\":\\\""+ areaArray[i]
-						+"\\\",\\\"formatted_address\\\":\\\""+formattedAddressArray[i]+"\\\"}]}";
+						+ houseNumberArray[i] + "\\\",\\\"houseName\\\":\\\"" + houseNameArray[i]
+						+ "\\\",\\\"poi\\\":\\\"" + poiArray[i] + "\\\",\\\"poi_dist\\\":\\\"" + poiDistArray[i]
+						+ "\\\",\\\"street\\\":\\\"" + streetArray[i] + "\\\",\\\"street_dist\\\":\\\""
+						+ streetDistArray[i] + "\\\",\\\"subSubLocality\\\":\\\"" + subSubLocalityArray[i]
+						+ "\\\",\\\"subLocality\\\":\\\"" + subLocalityArray[i] + "\\\",\\\"locality\\\":\\\""
+						+ localityArray[i] + "\\\",\\\"village\\\":\\\"" + villageArray[i]
+						+ "\\\",\\\"district\\\":\\\"" + districtArray[i] + "\\\",\\\"subDistrict\\\":\\\""
+						+ subDistrictArray[i] + "\\\",\\\"city\\\":\\\"" + cityArray2[i] + "\\\",\\\"state\\\":\\\""
+						+ stateArray2[i] + "\\\",\\\"pincode\\\":\\\"" + pincodeArray[i] + "\\\",\\\"lat\\\":\\\""
+						+ latArray[i] + "\\\",\\\"lng\\\":\\\"" + lngArray[i] + "\\\",\\\"area\\\":\\\"" + areaArray[i]
+						+ "\\\",\\\"formatted_address\\\":\\\"" + formattedAddressArray[i] + "\\\"}]}";
 
 				requestStringArray[i] = "lat=" + revGeoCode.getLat() + "&lng=" + revGeoCode.getLng();
 
@@ -829,9 +843,8 @@ public class RandomGenrator {
 			writeFieldsToExcel(lngArray, "lng");
 			writeFieldsToExcel(areaArray, "area");
 			writeFieldsToExcel(formattedAddressArray, "formattedAddress");
-			
+
 			writeFieldsToExcel(responseString, "responseString");
-			
 
 			break;
 
