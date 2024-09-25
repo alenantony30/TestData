@@ -1,20 +1,20 @@
-# Step 1: Use a base image that includes Python
+# Use an official Python runtime as a parent image
 FROM python:3.8-slim
 
-# Step 2: Set the working directory inside the container
+# Set the working directory in the container to /app
 WORKDIR /app
 
-# Step 3: Copy the requirements file and install dependencies (if you have one)
+# Copy the requirements.txt file into the container
 COPY requirements.txt .
 
-# Step 4: Install the dependencies
+# Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Step 5: Copy the current directory contents into the container at /app
+# Copy the current directory contents into the container at /app
 COPY . .
 
-# Step 6: Expose the port that the Flask app runs on
+# Make port 5000 available to the world outside this container
 EXPOSE 5000
 
-# Step 7: Define the command to run the app
-CMD ["python", "app.py"]
+# Run app.py when the container launches
+CMD ["python", "Indian name Generator.py"]
